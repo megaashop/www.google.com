@@ -1,0 +1,34 @@
+name: Auto_Update_Subs
+on:
+  push:
+    paths:
+      - 'subs/Ozime' # Diňe şu faýly üýtgetseňiz robot işläp başlar
+
+jobs:
+  copy-content:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Robota faýllary üýtgetmäge rugsat berýäris
+    steps:
+      - name: Kody alyp ulanmak
+        uses: actions/checkout@v4
+
+      - name: Master-y beýlekilere göçürmek
+        run: |
+          # 'subs' papkadaky ähli faýllary yzarlaýarys
+          for file in subs/*; do
+            # Eger faýl 'Ozime' bolmasa, içini Ozime bilen birmeňzeş et
+            if [ "$file" != "subs/Ozime" ]; then
+              cp subs/Ozime "$file"
+              echo "$file täzelendi"
+            fi
+          done
+
+      - name: Üýtgeşmeleri GitHub-a ibermek
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Robot: Ähli sub faýllary Ozime esasynda täzelendi" || exit 0
+          git push
+
